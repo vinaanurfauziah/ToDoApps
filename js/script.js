@@ -7,13 +7,13 @@ const SAVED_EVENT = 'saved-todo';
 const STORAGE_KEY = 'TODO_APPS';
 
 function isStorageExist() /* boolean */ {
-  if (typeof (Storage) === undefined) {
+  if (typeof Storage === undefined) {
     alert('Browser kamu tidak mendukung local storage');
     return false;
   }
   return true;
 }
-// 
+//
 document.addEventListener(SAVED_EVENT, function () {
   console.log(localStorage.getItem(STORAGE_KEY));
 });
@@ -44,6 +44,10 @@ document.addEventListener('DOMContentLoaded', function () {
     event.preventDefault();
     addTodo();
   });
+  // panggil fungsi saat elemen HTML sudah selesai dimuat menjadi DOM
+  if (isStorageExist()) {
+    loadDataFromStorage();
+  }
 });
 
 // 2. fungsi addTodo() untuk membuat Todo
@@ -191,3 +195,16 @@ function saveData() {
   }
 }
 
+// fungsi loadDataFromStorage()
+function loadDataFromStorage() {
+  const serializedData = localStorage.getItem(STORAGE_KEY);
+  let data = JSON.parse(serializedData);
+
+  if (data !== null) {
+    for (const todo of data) {
+      todos.push(todo);
+    }
+  }
+
+  document.dispatchEvent(new Event(RENDER_EVENT));
+}
