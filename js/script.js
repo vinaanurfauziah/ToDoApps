@@ -5,14 +5,19 @@ const RENDER_EVENT = 'render-todo'; // untuk mendefinisikan Custom Event dengan 
 // 5 & 7 listener dari RENDER_EVENT & event handler dari custom event RENDER_EVENT untuk menerapkan makeTodo()
 document.addEventListener(RENDER_EVENT, function () {
   const uncompletedTODOList = document.getElementById('todos');
-  // 7   
+  // 7
   uncompletedTODOList.innerHTML = '';
+
+  const completedTODOList = document.getElementById('completed-todos');
+  completedTODOList.innerHTML = '';
 
   for (const todoItem of todos) {
     const todoElement = makeTodo(todoItem);
-    if (!todoItem.isCompleted) { // 11. modifikasi event listener render agar menampilkan data yang sesuai, misalnya todo yang belum dikerjakan akan diletakkan pada “Yang harus dibaca”.
-        uncompletedTODOList.append(todoElement);
-    }   
+    if (!todoItem.isCompleted)
+      // 11. modifikasi event listener render agar menampilkan data yang sesuai, misalnya todo yang belum dikerjakan akan diletakkan pada “Yang harus dibaca”.
+      uncompletedTODOList.append(todoElement);
+    // 12. menampilkan todo pada rak “Yang sudah dilakukan”
+    else completedTODOList.append(todoElement);
   }
 });
 
@@ -125,4 +130,34 @@ function findTodo(todoId) {
     }
   }
   return null;
+}
+
+// 13. fungsi memindahkan todo yang sudah selesai dan menghapus todo agar bisa berjalan dengan baik
+function removeTaskFromCompleted(todoId) {
+  const todoTarget = findTodoIndex(todoId);
+
+  if (todoTarget === -1) return;
+
+  todos.splice(todoTarget, 1);
+  document.dispatchEvent(new Event(RENDER_EVENT));
+}
+
+function undoTaskFromCompleted(todoId) {
+  const todoTarget = findTodo(todoId);
+
+  if (todoTarget == null) return;
+
+  todoTarget.isCompleted = false;
+  document.dispatchEvent(new Event(RENDER_EVENT));
+}
+
+// 14. fungsi mengimplementasikan findTodoIndex() agar tidak error
+function findTodoIndex(todoId) {
+  for (const index in todos) {
+    if (todos[index].id === todoId) {
+      return index;
+    }
+  }
+
+  return -1;
 }
